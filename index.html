@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>QR Code Scanner</title>
+  <!-- Подключаем библиотеку -->
+  <script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 20px;
+      margin: 0;
+    }
+    h1 {
+      margin: 20px 0;
+    }
+    #reader {
+      margin: 0 auto;
+      width: 100%;
+      max-width: 400px;
+      height: auto;
+    }
+    #result {
+      margin-top: 20px;
+    }
+    /* Небольшой reset для body, чтобы занять всё пространство */
+    html, body {
+      height: 100%;
+      box-sizing: border-box;
+    }
+  </style>
+</head>
+<body>
+  <h1>Сканировать QR-код</h1>
+  
+  <!-- Здесь будет окно превью с камеры -->
+  <div id="reader"></div>
+  
+  <!-- Контейнер для результата -->
+  <p id="result">Результат: <span id="qr-result"></span></p>
+  
+  <!-- Скрипт инициализации сканера -->
+  <script>
+    // Блок, куда будем выводить результат распознавания
+    const resultContainer = document.getElementById("qr-result");
+
+    // Функция, которая вызывается при успешном сканировании
+    function onScanSuccess(decodedText) {
+      console.log("Decoded text:", decodedText);
+      
+      // Выводим результат в <span id="qr-result">
+      resultContainer.textContent = decodedText;
+      
+      // Если в тексте есть "http", перенаправляем
+      if (decodedText.startsWith("http")) {
+        window.location.href = decodedText;
+      }
+    }
+
+    // Функция, которая вызывается при ошибках (пока можно просто логировать)
+    function onScanError(error) {
+      console.warn("Ошибка сканирования:", error);
+    }
+
+    // Создаём объект сканера
+    const html5QrCode = new Html5Qrcode("reader");
+
+    // Запускаем сканирование
+    html5QrCode.start(
+      { facingMode: "environment" }, // просим камеру "с тыльной" стороны (на телефонах)
+      {
+        fps: 10,                      // кол-во кадров в секунду
+        qrbox: { width: 250, height: 250 },  // область сканирования (можно не указывать)
+      },
+      onScanSuccess,
+      onScanError
+    );
+  </script>
+</body>
+</html>
