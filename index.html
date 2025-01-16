@@ -6,35 +6,57 @@
   <!-- Подключаем библиотеку -->
   <script src="https://cdn.jsdelivr.net/npm/html5-qrcode@latest/dist/html5-qrcode.min.js"></script>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      padding: 20px;
-      margin: 0;
-    }
-    h1 {
-      margin: 20px 0;
-    }
-    #reader {
-      margin: 0 auto;
-      width: 100%;
-      max-width: 400px;
-      height: auto;
-    }
-    #result {
-      margin-top: 20px;
-    }
-    /* Небольшой reset для body, чтобы занять всё пространство */
+    /* Общий стиль */
     html, body {
+      margin: 0;
+      padding: 0;
       height: 100%;
       box-sizing: border-box;
+      font-family: Arial, sans-serif;
+      text-align: center;
+    }
+
+    /* Контейнер всей страницы */
+    body {
+      padding: 20px;
+    }
+
+    /* Заголовок */
+    h1 {
+      margin: 20px 0;
+      font-size: 1.8em; /* увеличиваем шрифт заголовка */
+    }
+
+    /* Окно для сканирования */
+    #reader {
+      margin: 0 auto;
+      width: 350px;   /* ширина области сканирования */
+      max-width: 90%; /* чтобы уменьшалось на маленьких экранах */
+      height: 350px;  /* высота области сканирования */
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+    }
+
+    /* Результат */
+    #result {
+      margin-top: 20px;
+      font-size: 1.3em; /* увеличиваем размер шрифта результата */
+      line-height: 1.4;
+      word-wrap: break-word; /* переносить длинные ссылки */
+    }
+
+    /* Кликабельная ссылка в результате */
+    #result a {
+      color: #0066cc;
+      text-decoration: underline;
+      word-break: break-all; /* переносить длинные ссылки */
     }
   </style>
 </head>
 <body>
   <h1>Сканировать QR-код</h1>
   
-  <!-- Здесь будет окно превью с камеры -->
+  <!-- Окно превью с камеры -->
   <div id="reader"></div>
   
   <!-- Контейнер для результата -->
@@ -42,23 +64,23 @@
   
   <!-- Скрипт инициализации сканера -->
   <script>
-    // Блок, куда будем выводить результат распознавания
+    // Где выводить текст результата
     const resultContainer = document.getElementById("qr-result");
 
-    // Функция, которая вызывается при успешном сканировании
+    // Функция: вызывается при успешном сканировании
     function onScanSuccess(decodedText) {
       console.log("Decoded text:", decodedText);
-      
-      // Выводим результат в <span id="qr-result">
-      resultContainer.textContent = decodedText;
-      
-      // Если в тексте есть "http", перенаправляем
+
+      // Если это ссылка, делаем её кликабельной
       if (decodedText.startsWith("http")) {
-        window.location.href = decodedText;
+        resultContainer.innerHTML = `<a href="${decodedText}" target="_blank">${decodedText}</a>`;
+      } else {
+        // Иначе просто текст
+        resultContainer.textContent = decodedText;
       }
     }
 
-    // Функция, которая вызывается при ошибках (пока можно просто логировать)
+    // Функция: вызывается при ошибках сканирования
     function onScanError(error) {
       console.warn("Ошибка сканирования:", error);
     }
@@ -68,10 +90,10 @@
 
     // Запускаем сканирование
     html5QrCode.start(
-      { facingMode: "environment" }, // просим камеру "с тыльной" стороны (на телефонах)
+      { facingMode: "environment" }, // задняя камера
       {
-        fps: 10,                      // кол-во кадров в секунду
-        qrbox: { width: 250, height: 250 },  // область сканирования (можно не указывать)
+        fps: 10,                      // частота сканирования
+        qrbox: { width: 300, height: 300 } // размер области сканирования
       },
       onScanSuccess,
       onScanError
